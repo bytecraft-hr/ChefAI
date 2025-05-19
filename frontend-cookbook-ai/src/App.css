@@ -1,0 +1,25 @@
+
+/* Glavni layout: sidebar lijevo, sadržaj desno */
+.layout-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: #fffaf3;
+}
+
+/* Desna strana – glavni sadržaj aplikacije */
+.layout-content {
+  flex-grow: 1;
+  padding: 40px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+html, body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  background-color: #fffaf3;
+
+  padding: 0;
+  overflow-x: hidden; 
+  height: 100%;
+}
