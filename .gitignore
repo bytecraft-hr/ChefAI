@@ -1,0 +1,11 @@
+.env
+.venv/
+__pycache__/
+*.pyc
+*.log
+langchain-*-firebase-adminsdk-*.json
+node_modules/
+*.sqlite
+*.db
+*.DS_Store
+
