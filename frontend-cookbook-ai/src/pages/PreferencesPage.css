@@ -1,0 +1,240 @@
+/* PreferencesPage.css */
+
+.preferences-grid {
+  background-color: #fffdf7;
+  border: 1px solid #e8dfd4;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  min-height: calc(100vh - 40px); 
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;     
+  box-sizing: border-box;
+  padding: 20px;
+  width: 100%;
+}
+
+h2 {
+  color: #c66900;
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+section {
+  background: #fff4d9;
+  border: 1px solid #ffe0b2;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-top: 1rem;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+
+
+h3 {
+  color: #b35400;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #ffa940;
+}
+
+.dislike-input,
+.favorite-form {
+  display: flex;
+  gap: 0.5rem;
+  margin-top:2rem;
+  align-items: center;
+  max-width: 180px;
+}
+
+
+/* Inputi */
+.dislike-input input,
+.favorite-form input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  height: 38px;
+  box-sizing: border-box;
+  min-width: 200px;
+}
+
+/* Gumbi */
+.dislike-input button,
+.favorite-form button {
+  background-color: #ffa63d;
+  color: white;
+  border: none;
+  padding: 0 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  height: 38px;
+  white-space: nowrap;
+}
+
+/* Hover */
+.dislike-input button:hover,
+.favorite-form button:hover {
+  background-color: #e6952f;
+}
+
+
+.dislike-list,
+.favorite-list {
+  list-style: none;
+  padding-left: 1rem;
+  margin-top: 0;
+}
+
+.dislike-list li,
+.favorite-list li {
+  margin-bottom: 0.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #fffaf1;
+  border: 1px solid #f5d5a1;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+}
+
+
+.save-button {
+  align-self: flex-end;
+  margin-top: 1rem;
+  background-color: #395307;
+  color: white;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  min-width: 110px;
+  height: 38px;
+}
+
+.remove-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.1rem;
+  display: flex;
+  align-items: center;
+  color: #d32f2f;
+  transition: transform 0.2s ease;
+}
+
+
+.option-with-remove {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  background-color: #fffaf1;
+  border: 1px solid #f5d5a1;
+}
+
+/* Gumb za brisanje */
+.icon-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.1rem;
+  display: flex;
+  align-items: center;
+  color: #d32f2f;
+  transition: transform 0.2s ease;
+}
+
+.icon-button:hover {
+  transform: scale(1.5);
+  color: #b71c1c;
+}
+
+/* Lista */
+.styled-list {
+  list-style: none;
+  padding-left: 0;
+  width: 100%;
+}
+.dislike-input input,
+.favorite-form input {
+  flex: 1;
+  padding: 0.5rem;
+  border-radius: 8px;
+  border: 2px solid #ccc;
+  font-size: 1rem;
+  height: 38px;
+  box-sizing: border-box;
+  min-width: 200px;
+  margin: 0; /* uklanja razlike zbog naslijeđenog margina */
+}
+
+.pantry-tags .ant-tag {
+  background-color: #fffaf1;
+  border: 1px solid #f5d5a1;
+  color: #3a2916;
+  font-size: 1rem;
+  font-weight: 500;
+  padding: 0.3rem 0.8rem;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  transition: all 0.2s ease-in-out;
+}
+
+.pantry-tags .ant-tag .anticon-close {
+  font-size: 0.9rem;
+  margin-left: 6px;
+  color: #e65100;
+  transition: color 0.2s ease;
+}
+@media (max-width: 600px) {
+  .dislike-input,
+  .favorite-form {
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 100%;
+  }
+
+  .dislike-input input,
+  .favorite-form input,
+  .dislike-input button,
+  .favorite-form button {
+    width: 100%;
+  }
+
+ .save-button{
+  width: 100%;
+ }
+ 
+}
