@@ -46,15 +46,22 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./langchain-f849f-firebase-adminsdk-fbsvc-d0950e3194.json:/app/firebase-credentials.json:ro
+<<<<<<< HEAD
       - ./static:/app/static
     # ADDED SECTION:
     environment:
       - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
+=======
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 
 
   frontend:
     build:
+<<<<<<< HEAD
       context: ./frontend-cookbook-ai
+=======
+      context: ./frontend-cookbook-ai          # ← relative to this yaml
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
       dockerfile: Dockerfile
     ports:
       - "3000:80"
@@ -62,4 +69,8 @@ services:
       - backend
 
 volumes:
+<<<<<<< HEAD
   postgres_data:
+=======
+  postgres_data:
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

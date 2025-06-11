@@ -3,6 +3,7 @@
   border: 1px solid #e8dfd4;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+<<<<<<< HEAD
   height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
@@ -12,6 +13,17 @@
   padding: 20px;
   width: 100%;
   overflow: hidden;
+=======
+  height: calc(100vh - 40px); 
+  display: flex;
+  flex-direction: column;
+  justify-content: center; 
+  align-items: center;     
+  box-sizing: border-box;
+  padding: 20px;
+  width: 100%;
+  overflow: hidden; 
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 }
 
 .chatpage-container.dark {
@@ -68,9 +80,15 @@
   animation: slideUp 0.6s ease !important;
   display: flex !important;
   flex-direction: column !important;
+<<<<<<< HEAD
   flex-grow: 1;
   overflow-y: auto;
   max-height: 100%;
+=======
+  flex-grow: 1;                
+  overflow-y: auto;     
+  max-height: 100%;     
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 }
 
 .chatpage-container.dark .chat-box {
@@ -170,11 +188,19 @@
 
 .recipe-card {
   flex: 1 1 300px !important;
+<<<<<<< HEAD
   max-width: 33% !important;
   background: #fffdf7 !important;
   border: 1px solid #e8dfd4 !important;
   border-radius: 12px !important;
   padding: 30px !important;
+=======
+  max-width: 25% !important;
+  background: #fffdf7 !important;
+  border: 1px solid #e8dfd4 !important;
+  border-radius: 12px !important;
+  padding: 12px !important;
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
   font-size: 14px !important;
   max-height: 400px !important;
   overflow-y: auto !important;
@@ -187,6 +213,7 @@
 
 .recipe-image {
   width: 100% !important;
+<<<<<<< HEAD
   height: 140px !important;
   object-fit: cover !important;
   border-radius: 8px !important;
@@ -209,6 +236,19 @@
   justify-content: space-between;
   margin-top: 10px;
   color: #7a3e00;
+=======
+  max-height: 140px !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  margin: 10px 0 !important;
+}
+
+.recipe-meta {
+  display: flex !important;
+  justify-content: space-between !important;
+  font-size: 13px !important;
+  margin-bottom: 8px !important;
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 }
 
 .ingredients-list {
@@ -235,6 +275,7 @@
 }
 
 .recipe-button {
+<<<<<<< HEAD
   padding: 8px 14px !important;
   font-size: 14px !important;
   font-weight: 600 !important;
@@ -268,6 +309,39 @@
 }
 
 
+=======
+  font-size: 14px !important;
+  padding: 6px 10px !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 5px !important;
+}
+
+.recipe-button.view {
+  background-color: #ffa63d !important;
+  color: rgb(0, 0, 0) !important;
+}
+
+.recipe-button.view:hover {
+  background-color: #ff931a !important;
+}
+
+.recipe-button.save {
+  background-color: #efefef !important;
+  color: #d60000 !important;
+  border: 1px solid #ccc !important;
+}
+
+.recipe-button.save:hover {
+  background-color: #fbdcdc !important;
+  border-color: #ffbdbd !important;
+}
+
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 .chatpage-container.dark .recipe-button.view {
   background-color: #d68100 !important;
 }
@@ -287,7 +361,35 @@
   border-color: #cc4444 !important;
 }
 
+<<<<<<< HEAD
 
+=======
+/* MODAL */
+.recipe-modal-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 1000 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+.recipe-modal {
+  background: #fffdf7 !important;
+  padding: 30px !important;
+  border-radius: 12px !important;
+  max-width: 700px !important;
+  width: 90% !important;
+  max-height: 90vh !important;
+  overflow-y: auto !important;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.25) !important;
+  position: relative !important;
+}
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 
 .chatpage-container.dark .recipe-modal {
   background: #2a2a2a !important;
@@ -299,7 +401,17 @@
   color: #b35400 !important;
 }
 
+<<<<<<< HEAD
 
+=======
+.recipe-modal img {
+  width: 100% !important;
+  max-height: 250px !important;
+  object-fit: cover !important;
+  border-radius: 8px !important;
+  margin: 12px 0 !important;
+}
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 
 .recipe-modal .ingredients-list {
   margin: 8px 0 !important;
@@ -398,8 +510,12 @@
   }
 
   .recipe-card {
+<<<<<<< HEAD
     flex: 0 0 32% !important;
     max-width: 32% !important;
+=======
+    flex: 0 0 90% !important;
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
   }
 }
 /* Override bubble style when showing recipes */
@@ -416,6 +532,7 @@
 }
 @media (max-width: 768px) {
   .recipe-list {
+<<<<<<< HEAD
     flex-direction: column !important;
     overflow-x: hidden !important;
     gap: 16px !important;
@@ -511,3 +628,20 @@
     max-height: 200px !important;
   }
 }
+=======
+    display: flex !important;
+    overflow-x: auto !important;
+    flex-wrap: nowrap !important;
+    gap: 12px !important;
+    padding-bottom: 10px !important;
+    scroll-snap-type: x mandatory !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+
+  .recipe-card {
+    flex: 0 0 240px !important;
+    max-width: 80% !important;
+    scroll-snap-align: start !important;
+  }
+}
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

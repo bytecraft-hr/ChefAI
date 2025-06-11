@@ -6,7 +6,11 @@ import './FavoritesPage.css'
 export default function FavoritesPage() {
   const { getToken } = useAuth()
   const [favorites, setFavorites] = useState([])
+<<<<<<< HEAD
   const [modalRecipe, setModalRecipe] = useState(null)
+=======
+  const [expandedIndex, setExpandedIndex] = useState(null)
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 
   useEffect(() => {
     const fetchFavorites = async () => {
@@ -43,6 +47,10 @@ export default function FavoritesPage() {
       alert('Neuspješno brisanje.')
     }
   }
+<<<<<<< HEAD
+=======
+  
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 
   return (
     <div className="favorites-page">
@@ -55,6 +63,7 @@ export default function FavoritesPage() {
           {favorites.map((recipe, index) => (
             <div key={index} className="favorite-card">
               <h3>{recipe.title}</h3>
+<<<<<<< HEAD
               {recipe.image && <img src={recipe.image} alt={recipe.title} className="favorite-image" />}
 
               <div className="favorite-meta">
@@ -66,10 +75,39 @@ export default function FavoritesPage() {
                 <button className="recipe-button view" onClick={() => setModalRecipe(recipe)}>Pogledaj</button>
                 <button className="recipe-button save" onClick={() => deleteFavorite(recipe.id)}>Ukloni</button>
               </div>
+=======
+
+              {recipe.image && <img src={recipe.image} alt={recipe.title} className="favorite-image" />}
+              <div className="favorite-meta">
+                <span><strong>Vrijeme pripreme</strong> {recipe.ready_in_minutes} min</span>
+                <span> {recipe.servings} porcija</span>
+              </div>
+
+              {expandedIndex === index ? (
+                <div className="recipe-details">
+                  <div className="favorite-ingredients">
+                    <ul>
+                      {recipe.ingredients.map((ing, i) => (
+                        <li key={i}>{ing}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div className="favorite-instructions" dangerouslySetInnerHTML={{ __html: recipe.instructions }} />
+                  <button className="toggle-button" onClick={() => setExpandedIndex(null)}>Zatvori</button>
+                </div>
+              ) : (
+                <div className="recipe-summary">
+                <button className="toggle-button" onClick={() => setExpandedIndex(index)}>Prikaži recept</button>
+                <button className="delete-button" onClick={() => deleteFavorite(recipe.id)}>Ukloni</button>
+              </div>
+              
+              )}
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
             </div>
           ))}
         </div>
       )}
+<<<<<<< HEAD
 
       {modalRecipe && (
         <div className="recipe-modal-overlay" onClick={() => setModalRecipe(null)}>
@@ -87,6 +125,8 @@ export default function FavoritesPage() {
           </div>
         </div>
       )}
+=======
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
     </div>
   )
 }

@@ -546,6 +546,7 @@
     width: 100%;
   }
   
+<<<<<<< HEAD
 }
 
 /* Loading overlay when recipe+image are being generated */
@@ -592,3 +593,6 @@
   font-family: inherit;
   margin: 0;
 }
+=======
+}
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

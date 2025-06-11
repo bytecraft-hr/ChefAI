@@ -12,7 +12,12 @@ class User(Base):
     hashed_password = Column(String, nullable=False)
     is_active     = Column(Boolean, default=True)
     is_verified   = Column(Boolean, default=False)
+<<<<<<< HEAD
     favorite_recipes = relationship("FavoriteRecipe", back_populates="user", cascade="all, delete")
+=======
+    favorites = relationship("FavoriteRecipe", back_populates="user", cascade="all, delete")
+    favorite_recipes = relationship("FavoriteRecipe", back_populates="user")
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
     pantry_items  = relationship("PantryItem", back_populates="user", cascade="all,delete")
     settings      = relationship("UserSettings", uselist=False, back_populates="user", cascade="all,delete")
 

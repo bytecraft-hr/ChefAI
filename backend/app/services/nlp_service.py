@@ -62,6 +62,7 @@ def get_user_profile_from_db(db: Session, user_id: int) -> Dict[str, Any]:
     user = db.get(User, user_id)
     if not user:
         return {"preferences": {}, "pantry": []}
+<<<<<<< HEAD
 
     prefs_raw = user.settings.preferences if user.settings else {}
     prefs = prefs_raw if isinstance(prefs_raw, dict) else {}  # ✅ SAFETY CHECK
@@ -70,6 +71,12 @@ def get_user_profile_from_db(db: Session, user_id: int) -> Dict[str, Any]:
     return {"preferences": prefs, "pantry": pantry}
 
 
+=======
+    prefs = user.settings.preferences if user.settings else {}
+    pantry = [item.name for item in user.pantry_items]
+    return {"preferences": prefs, "pantry": pantry}
+
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 # — Rule-based NLP —
 
 def extract_intent_and_entities(query: str) -> Tuple[str, Dict[str, List[str]]]:
@@ -90,7 +97,11 @@ def filter_recipes(
     prefs: Dict[str, Any]
 ) -> List[Dict[str, Any]]:
     out = []
+<<<<<<< HEAD
     threshold = prefs.get("match_threshold", 0.5)
+=======
+    threshold = 0.5
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
     for r in recipes:
         ingr = set(r["ingredients"])
         if len(ingr & set(pantry)) / max(len(ingr), 1) < threshold:
@@ -185,4 +196,8 @@ def create_rag_chain(llm, store, k: int = 4):
         ("human", "{input}")
     ])
     stuff = create_stuff_documents_chain(llm, qa_prompt)
+<<<<<<< HEAD
     return create_retrieval_chain(har, stuff)
+=======
+    return create_retrieval_chain(har, stuff)
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

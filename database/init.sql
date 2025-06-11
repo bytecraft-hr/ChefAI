@@ -178,6 +178,7 @@ INSERT INTO recipe_ingredients (recipe_id, ingredient_id, quantity, unit) VALUES
   (5, 3, NULL, NULL),
   (5, 4, NULL, NULL)
 ON CONFLICT DO NOTHING;
+<<<<<<< HEAD
 
 -- ─── FAVORITE RECIPES ────────────────────────────────────────────────────────
 CREATE TABLE IF NOT EXISTS favorite_recipes (
@@ -191,3 +192,5 @@ CREATE TABLE IF NOT EXISTS favorite_recipes (
   instructions TEXT
 );
 
+=======
+>>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
