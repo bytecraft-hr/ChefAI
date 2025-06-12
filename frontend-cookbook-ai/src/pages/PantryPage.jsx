@@ -1,35 +1,27 @@
 // src/pages/PantryPage.jsx
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import './PantryPage.css'
-import { Trash2 } from 'lucide-react'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
-import { registerLocale } from 'react-datepicker'
-import hr from 'date-fns/locale/hr'
-import { Tag } from 'antd'
-import 'antd/dist/reset.css'
+import { X } from 'lucide-react'
 
-registerLocale('hr', hr)
-
-const initialFilterGroups = [
-  {
-    groupName: 'Kod kuće uvijek imam',
-    options: [],
-    allowCustomAdd: true,
-  },
-  {
-    groupName: 'Dozvoljen način pripreme',
-    options: ['svi načini pripreme', 'kuhano', 'pečeno', 'prženo'],
-    allowCustomAdd: false,
-  },
-  {
-    groupName: 'Danas dodatno imam',
-    options: [],
-    allowCustomAdd: true,
-  },
+// Constants
+const TOTAL_STEPS = 6
+const STEP_NAMES = [
+  'Unesi što uvijek imaš kod kuće',
+  'Odaberi načine pripreme',
+  'Dodaj što danas dodatno imaš',
+  'Za koliko osoba kuhaš i koliko vremena imaš?',
+  'Spremni za kuhanje?',
+  'Predloženi recept'
 ]
 
-const dailyTips = [
+const PREPARATION_METHODS = [
+  'svi načini pripreme',
+  'kuhano',
+  'pečeno',
+  'prženo'
+]
+
+const DAILY_TIPS = [
   'Ako imaš ostatke povrća, kombiniraj ih u brzinsku juhu ili stir-fry!',
   'Riža od jučer? Dodaj jaje i povrće za fini prženi rižoto.',
   'Kruh je star? Ispeci bruskete s maslinovim uljem i češnjakom.',
@@ -42,377 +34,409 @@ const dailyTips = [
   'Kuhani krumpir? Ispeci ga s malo začina za super prilog.',
 ]
 
+const API_BASE_URL = 'http://localhost:8000'
+
 export default function PantryPage() {
-  const [validationMessage, setValidationMessage] = useState('')
-  const [filterSelections, setFilterSelections] = useState({
-    'Kod kuće uvijek imam': [],
-    'Dozvoljen način pripreme': ['svi načini pripreme'],
-    'Danas dodatno imam': [],
+  // Unified state management
+  const [pantryState, setPantryState] = useState({
+    alwaysHave: [],
+    todayHave: [],
+    preparationMethods: ['svi načini pripreme'],
+    numberOfPeople: 1,
+    prepTime: 20
   })
-  const [filterGroups, setFilterGroups] = useState(initialFilterGroups)
-  const [newFilterValues, setNewFilterValues] = useState({})
-  const [numberOfPeople, setNumberOfPeople] = useState(1)
-  const [prepTime, setPrepTime] = useState(20)
-  const [currentStep, setCurrentStep] = useState(0)
-  const [dailyTip, setDailyTip] = useState('')
-  const [ragRecipe, setRagRecipe] = useState(null)
-  const [generatedImage, setGeneratedImage] = useState(null)
-  const [loading, setLoading] = useState(false)
 
-  // pick a random tip on mount
+  const [uiState, setUiState] = useState({
+    currentStep: 0,
+    loading: false,
+    error: null,
+    dailyTip: '',
+    newItemInputs: { alwaysHave: '', todayHave: '' }
+  })
+
+  const [recipe, setRecipe] = useState(null)
+  const [userSettings, setUserSettings] = useState({
+    allergies: [],
+    dislikes: [],
+    preferences: [],
+    favorites: []
+  })
+
+  // Initialize user settings and daily tip
   useEffect(() => {
-    const tip = dailyTips[Math.floor(Math.random() * dailyTips.length)]
-    setDailyTip(tip)
+    const settings = JSON.parse(localStorage.getItem('userSettings') || '{}')
+    setUserSettings(settings)
+
+    const randomTip = DAILY_TIPS[Math.floor(Math.random() * DAILY_TIPS.length)]
+    setUiState(prev => ({
+      ...prev,
+      dailyTip: randomTip,
+      currentStep: 0   // 👈 This line ensures you always start at step 0
+    }))
   }, [])
 
-  // load pantry items from backend
+
+  // Load pantry items from backend
   useEffect(() => {
-    const token = localStorage.getItem('accessToken')
-    if (!token) return
+    const loadPantryItems = async () => {
+      const token = localStorage.getItem('accessToken')
+      if (!token) return
 
-    fetch('http://localhost:8000/pantry', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
-      .then(res => res.json())
-      .then(data => {
-        const updated = [...initialFilterGroups]
-        updated[0].options = data
-          .filter(i => i.category === 'Kod kuće uvijek imam')
-          .map(i => i.name)
-        updated[2].options = data
-          .filter(i => i.category === 'Danas dodatno imam')
-          .map(i => i.name)
+      try {
+        const response = await fetch(`${API_BASE_URL}/pantry`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
 
-        setFilterGroups(updated)
-        setFilterSelections(prev => ({
+        if (!response.ok) throw new Error('Greška pri dohvaćanju podataka')
+
+        const data = await response.json()
+
+        setPantryState(prev => ({
           ...prev,
-          'Kod kuće uvijek imam': updated[0].options,
-          'Danas dodatno imam': updated[2].options,
+          alwaysHave: data
+            .filter(item => item.category === 'Kod kuće uvijek imam')
+            .map(item => item.name),
+          todayHave: data
+            .filter(item => item.category === 'Danas dodatno imam')
+            .map(item => item.name)
         }))
-      })
-      .catch(err => console.error('Greška kod dohvata sastojaka:', err))
+      } catch (error) {
+        setUiState(prev => ({
+          ...prev,
+          error: `Greška kod dohvata sastojaka: ${error.message}`
+        }))
+      }
+    }
+
+    loadPantryItems()
   }, [])
 
-  const toggleFilter = (groupName, option) => {
-    setFilterSelections(prev => {
-      const current = prev[groupName] || []
-      if (current.includes(option)) {
-        return { ...prev, [groupName]: current.filter(i => i !== option) }
-      } else {
-        return { ...prev, [groupName]: [...current, option] }
-      }
+  // API helper functions
+  const apiCall = useCallback(async (endpoint, options = {}) => {
+    const token = localStorage.getItem('accessToken')
+    if (!token) throw new Error('Nisi prijavljen!')
+
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+        ...options.headers
+      },
+      ...options
     })
-  }
 
-  const handleAddCustomFilter = groupIndex => {
-    const group = filterGroups[groupIndex]
-    const groupName = group.groupName
-    const value = newFilterValues[groupName]?.trim()
-    if (!value) return
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
 
-    if (group.options.includes(value)) {
-      setValidationMessage('Ovaj sastojak već postoji!')
-      setTimeout(() => setValidationMessage(''), 3000)
+    return response.json()
+  }, [])
+
+  // Error handling
+  const handleError = useCallback((error, duration = 5000) => {
+    setUiState(prev => ({ ...prev, error: error.message || error }))
+    setTimeout(() => {
+      setUiState(prev => ({ ...prev, error: null }))
+    }, duration)
+  }, [])
+
+  // Pantry item management
+  const addPantryItem = useCallback(async (category, value) => {
+    if (!value.trim()) return
+
+    const categoryKey = category === 'Kod kuće uvijek imam' ? 'alwaysHave' : 'todayHave'
+    const inputKey = category === 'Kod kuće uvijek imam' ? 'alwaysHave' : 'todayHave'
+
+    if (pantryState[categoryKey].includes(value.trim())) {
+      handleError('Ovaj sastojak već postoji!', 3000)
       return
-    }
-
-    // update groups
-    setFilterGroups(prev => {
-      const updated = [...prev]
-      updated[groupIndex] = {
-        ...updated[groupIndex],
-        options: [...updated[groupIndex].options, value],
-      }
-      return updated
-    })
-    // select it
-    setFilterSelections(prev => ({
-      ...prev,
-      [groupName]: [...(prev[groupName] || []), value],
-    }))
-    // clear input
-    setNewFilterValues(prev => ({ ...prev, [groupName]: '' }))
-
-    // persist
-    const token = localStorage.getItem('accessToken')
-    if (token) {
-      fetch('http://localhost:8000/pantry', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ name: value, category: groupName }),
-      }).catch(err => console.error('Greška kod spremanja:', err))
-    }
-  }
-
-  const removeFilterOption = (groupIndex, option) => {
-    const groupName = filterGroups[groupIndex].groupName
-    setFilterGroups(prev => {
-      const updated = [...prev]
-      updated[groupIndex] = {
-        ...updated[groupIndex],
-        options: updated[groupIndex].options.filter(o => o !== option),
-      }
-      return updated
-    })
-    setFilterSelections(prev => ({
-      ...prev,
-      [groupName]: (prev[groupName] || []).filter(i => i !== option),
-    }))
-
-    const token = localStorage.getItem('accessToken')
-    if (token) {
-      fetch(`http://localhost:8000/pantry/${encodeURIComponent(option)}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      }).catch(err => console.error('Greška kod brisanja:', err))
-    }
-  }
-
-  const goToStep = step => {
-    setCurrentStep(step)
-    setValidationMessage('')
-  }
-
-  const handleRecipeSearch = async () => {
-    const token = localStorage.getItem('accessToken')
-    if (!token) {
-      setValidationMessage('Nisi prijavljen!')
-      setTimeout(() => setValidationMessage(''), 3000)
-      return
-    }
-
-    const userSettings =
-      JSON.parse(localStorage.getItem('userSettings') || '{}')
-
-    const payload = {
-      always_have: filterSelections['Kod kuće uvijek imam'] || [],
-      extras_today: filterSelections['Danas dodatno imam'] || [],
-      allowed_methods:
-        filterSelections['Dozvoljen način pripreme'] || [],
-      prep_time: prepTime,
-      people: numberOfPeople,
-      allergies: userSettings.allergies || [],
-      dislikes: userSettings.dislikes || [],
-      preferences: userSettings.preferences || [],
-      favorites: userSettings.favorites || [],
     }
 
     try {
-      setLoading(true)
-      setValidationMessage('')
-
-      const res = await fetch('http://localhost:8000/cook/rag', {
+      await apiCall('/pantry', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({ name: value.trim(), category })
       })
-      if (!res.ok) throw new Error('Greška kod generiranja recepta.')
-      const data = await res.json()
-      setRagRecipe(data)
-      setGeneratedImage(data.image_url || null)
-      setCurrentStep(5)
-    } catch (e) {
-      setValidationMessage('Greška: ' + e.message)
-      setTimeout(() => setValidationMessage(''), 5000)
-    } finally {
-      setLoading(false)
-    }
-  }
 
-  const startNewSearch = () => {
-    setCurrentStep(0)
-    setRagRecipe(null)
-    setGeneratedImage(null)
-    setValidationMessage('')
-  }
+      setPantryState(prev => ({
+        ...prev,
+        [categoryKey]: [...prev[categoryKey], value.trim()]
+      }))
+
+      setUiState(prev => ({
+        ...prev,
+        newItemInputs: {
+          ...prev.newItemInputs,
+          [inputKey]: ''
+        }
+      }))
+    } catch (error) {
+      handleError(error)
+    }
+  }, [pantryState, apiCall, handleError])
+
+  const removePantryItem = useCallback(async (category, item) => {
+    const categoryKey = category === 'Kod kuće uvijek imam' ? 'alwaysHave' : 'todayHave'
+
+    try {
+      await apiCall(`/pantry/${encodeURIComponent(item)}`, {
+        method: 'DELETE'
+      })
+
+      setPantryState(prev => ({
+        ...prev,
+        [categoryKey]: prev[categoryKey].filter(i => i !== item)
+      }))
+    } catch (error) {
+      handleError(error)
+    }
+  }, [apiCall, handleError])
+
+  // Step navigation
+  const goToStep = useCallback((step) => {
+    if (step >= 0 && step < TOTAL_STEPS) {
+      setUiState(prev => ({ ...prev, currentStep: step, error: null }))
+    }
+  }, [])
+
+  // Recipe generation
+  const generateRecipe = useCallback(async () => {
+    try {
+      setUiState(prev => ({ ...prev, loading: true, error: null }))
+
+      const payload = {
+        always_have: pantryState.alwaysHave,
+        extras_today: pantryState.todayHave,
+        allowed_methods: pantryState.preparationMethods,
+        prep_time: pantryState.prepTime,
+        people: pantryState.numberOfPeople,
+        allergies: userSettings.allergies,
+        dislikes: userSettings.dislikes,
+        preferences: userSettings.preferences,
+        favorites: userSettings.favorites
+      }
+
+      const data = await apiCall('/cook/rag', {
+        method: 'POST',
+        body: JSON.stringify(payload)
+      })
+
+      setRecipe(data)
+      goToStep(5)
+    } catch (error) {
+      handleError(error)
+    } finally {
+      setUiState(prev => ({ ...prev, loading: false }))
+    }
+  }, [pantryState, userSettings, apiCall, handleError, goToStep])
+
+  // Toggle preparation method
+  const togglePreparationMethod = useCallback((method) => {
+    setPantryState(prev => ({
+      ...prev,
+      preparationMethods: prev.preparationMethods.includes(method)
+        ? prev.preparationMethods.filter(m => m !== method)
+        : [...prev.preparationMethods, method]
+    }))
+  }, [])
+
+  // Input handlers
+  const handleInputChange = useCallback((field, value) => {
+    if (field === 'newItemInput') {
+      const [category, inputValue] = value
+      setUiState(prev => ({
+        ...prev,
+        newItemInputs: {
+          ...prev.newItemInputs,
+          [category]: inputValue
+        }
+      }))
+    } else {
+      setPantryState(prev => ({ ...prev, [field]: value }))
+    }
+  }, [])
+
+  // Step validation
+  const canProceedToNext = useCallback((step) => {
+    switch (step) {
+      case 1: return pantryState.preparationMethods.length > 0
+      default: return true
+    }
+  }, [pantryState.preparationMethods])
+
+  // Reset function
+  const resetSearch = useCallback(() => {
+    setRecipe(null)
+    goToStep(0)
+  }, [goToStep])
+
+  const progressPercentage = (uiState.currentStep / (TOTAL_STEPS - 1)) * 100
 
   return (
     <div className="pantry-grid">
-      {loading && (
+      {uiState.loading && (
         <div className="loading-overlay">
-          Generiram recept i sliku...
+          <div className="loading-content">
+            <div className="spinner"></div>
+            <p>Generiram recept i sliku...</p>
+          </div>
         </div>
       )}
 
-      {validationMessage && (
-        <div className="validation-message">
-          {validationMessage}
+      {uiState.error && (
+        <div className="error-message">
+          <span>{uiState.error}</span>
+          <button
+            onClick={() => setUiState(prev => ({ ...prev, error: null }))}
+            className="error-close"
+          >
+            <X size={16} />
+          </button>
         </div>
       )}
 
       <div className="step-title">
-        {currentStep === 0 && (
-          <p>Unesi što uvijek imaš kod kuće</p>
-        )}
-        {currentStep === 1 && (
-          <p>Odaberi načine pripreme</p>
-        )}
-        {currentStep === 2 && (
-          <p>Dodaj što danas dodatno imaš</p>
-        )}
-        {currentStep === 3 && (
-          <p>Za koliko osoba kuhaš i koliko vremena imaš?</p>
-        )}
-        {currentStep === 4 && <p>Spremni za kuhanje?</p>}
-        {currentStep === 5 && <p>Predloženi recept</p>}
+        <h2>{STEP_NAMES[uiState.currentStep]}</h2>
       </div>
 
       <div className="progress-container">
         <div
           className="progress-bar"
-          style={{
-            width: `${(currentStep / 5) * 100}%`,
-          }}
+          style={{ width: `${progressPercentage}%` }}
         />
+        <span className="progress-text">
+          {uiState.currentStep + 1} / {TOTAL_STEPS}
+        </span>
       </div>
 
-      {/* STEP 0 */}
-      {currentStep === 0 && (
+      {/* Step 0: Always Have Items */}
+      {uiState.currentStep === 0 && (
         <div className="filter-group">
-          <strong>{filterGroups[0].groupName}</strong>
-
-          {filterGroups[0].options.length === 0 && (
-            <div className="empty-hint">
-              <p>
-                Ovdje možete dodati stavke koje uvijek imate
-                kod kuće.
-              </p>
-            </div>
-          )}
-
-          <div className="filter-options pantry-tags">
-            {filterGroups[0].options.map(opt => (
-              <Tag
-                key={opt}
-                closable
-                onClose={() => removeFilterOption(0, opt)}
-                color={
-                  filterSelections['Kod kuće uvijek imam']?.includes(
-                    opt
-                  )
-                    ? 'blue'
-                    : 'default'
-                }
-              >
-                {opt}
-              </Tag>
-            ))}
+          <div className="items-container">
+            {pantryState.alwaysHave.length === 0 ? (
+              <div className="empty-hint">
+                <p>Ovdje možete dodati stavke koje uvijek imate kod kuće.</p>
+              </div>
+            ) : (
+              <div className="items-grid">
+                {pantryState.alwaysHave.map(item => (
+                  <div key={item} className="item-tag">
+                    <span>{item}</span>
+                    <button
+                      onClick={() => removePantryItem('Kod kuće uvijek imam', item)}
+                      className="remove-btn"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
 
-          <div className="add-custom-filter">
+          <div className="add-item-section">
             <input
               type="text"
               placeholder="Dodaj sastojak..."
-              value={
-                newFilterValues[filterGroups[0].groupName] || ''
-              }
-              onChange={e =>
-                setNewFilterValues({
-                  ...newFilterValues,
-                  [filterGroups[0].groupName]: e.target.value,
-                })
-              }
-              onKeyPress={e =>
-                e.key === 'Enter' && handleAddCustomFilter(0)
-              }
+              value={uiState.newItemInputs.alwaysHave}
+              onChange={(e) => handleInputChange('newItemInput', ['alwaysHave', e.target.value])}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  addPantryItem('Kod kuće uvijek imam', uiState.newItemInputs.alwaysHave)
+                }
+              }}
             />
-            <button onClick={() => handleAddCustomFilter(0)}>
-              +
+            <button
+              onClick={() => addPantryItem('Kod kuće uvijek imam', uiState.newItemInputs.alwaysHave)}
+              className="add-btn"
+            >
+              Dodaj
             </button>
           </div>
 
           <div className="navigation-buttons">
-            <button onClick={() => goToStep(1)}>
+            <button onClick={() => goToStep(1)}>Sljedeće</button>
+          </div>
+        </div>
+      )}
+
+      {/* Step 1: Preparation Methods */}
+      {uiState.currentStep === 1 && (
+        <div className="filter-group">
+          <div className="preparation-methods">
+            {PREPARATION_METHODS.map(method => (
+              <label key={method} className="method-option">
+                <input
+                  type="checkbox"
+                  checked={pantryState.preparationMethods.includes(method)}
+                  onChange={() => togglePreparationMethod(method)}
+                />
+                <span>{method}</span>
+              </label>
+            ))}
+          </div>
+
+          <div className="navigation-buttons">
+            <button onClick={() => goToStep(0)}>Natrag</button>
+            <button
+              onClick={() => goToStep(2)}
+              disabled={!canProceedToNext(1)}
+            >
               Sljedeće
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 1 */}
-      {currentStep === 1 && (
+      {/* Step 2: Today's Items */}
+      {uiState.currentStep === 2 && (
         <div className="filter-group">
-          <strong>{filterGroups[1].groupName}</strong>
-          <div className="preparation-options">
-            {filterGroups[1].options.map(opt => (
-              <label key={opt} className="option">
-                <input
-                  type="checkbox"
-                  checked={
-                    filterSelections[
-                      filterGroups[1].groupName
-                    ]?.includes(opt) || false
-                  }
-                  onChange={() =>
-                    toggleFilter(
-                      filterGroups[1].groupName,
-                      opt
-                    )
-                  }
-                />
-                {opt}
-              </label>
-            ))}
-          </div>
-          <div className="navigation-buttons">
-            <button onClick={() => goToStep(0)}>Natrag</button>
-            <button onClick={() => goToStep(2)}>Sljedeće</button>
-          </div>
-        </div>
-      )}
-
-      {/* STEP 2 */}
-      {currentStep === 2 && (
-        <div className="filter-group">
-          <strong>{filterGroups[2].groupName}</strong>
           <div className="daily-tip">
-            <em>{dailyTip}</em>
+            <p><em>{uiState.dailyTip}</em></p>
           </div>
-          <div className="filter-options pantry-tags">
-            {filterGroups[2].options.map(opt => (
-              <Tag
-                key={opt}
-                closable
-                onClose={() => removeFilterOption(2, opt)}
-                color={
-                  filterSelections['Danas dodatno imam']?.includes(
-                    opt
-                  )
-                    ? 'green'
-                    : 'default'
-                }
-              >
-                {opt}
-              </Tag>
-            ))}
+
+          <div className="items-container">
+            {pantryState.todayHave.length === 0 ? (
+              <div className="empty-hint">
+                <p>Dodajte sastojke koje danas imate pri ruci.</p>
+              </div>
+            ) : (
+              <div className="items-grid">
+                {pantryState.todayHave.map(item => (
+                  <div key={item} className="item-tag today-item">
+                    <span>{item}</span>
+                    <button
+                      onClick={() => removePantryItem('Danas dodatno imam', item)}
+                      className="remove-btn"
+                    >
+                      <X size={14} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-          <div className="add-custom-filter">
+
+          <div className="add-item-section">
             <input
               type="text"
               placeholder="Dodaj novi sastojak..."
-              value={
-                newFilterValues[filterGroups[2].groupName] || ''
-              }
-              onChange={e =>
-                setNewFilterValues({
-                  ...newFilterValues,
-                  [filterGroups[2].groupName]: e.target.value,
-                })
-              }
-              onKeyPress={e =>
-                e.key === 'Enter' && handleAddCustomFilter(2)
-              }
+              value={uiState.newItemInputs.todayHave}
+              onChange={(e) => handleInputChange('newItemInput', ['todayHave', e.target.value])}
+              onKeyPress={(e) => {
+                if (e.key === 'Enter') {
+                  addPantryItem('Danas dodatno imam', uiState.newItemInputs.todayHave)
+                }
+              }}
             />
-            <button onClick={() => handleAddCustomFilter(2)}>
-              +
+            <button
+              onClick={() => addPantryItem('Danas dodatno imam', uiState.newItemInputs.todayHave)}
+              className="add-btn"
+            >
+              Dodaj
             </button>
           </div>
+
           <div className="navigation-buttons">
             <button onClick={() => goToStep(1)}>Natrag</button>
             <button onClick={() => goToStep(3)}>Sljedeće</button>
@@ -420,29 +444,25 @@ export default function PantryPage() {
         </div>
       )}
 
-      {/* STEP 3 */}
-      {currentStep === 3 && (
+      {/* Step 3: Cooking Parameters */}
+      {uiState.currentStep === 3 && (
         <div className="cooking-params">
-          <h3>Detalji pripreme</h3>
-          <div className="cooking-param">
+          <div className="param-group">
             <label htmlFor="peopleCount">Kuham za:</label>
             <input
               id="peopleCount"
               type="number"
               min="1"
               max="20"
-              value={numberOfPeople}
-              onChange={e =>
-                setNumberOfPeople(
-                  parseInt(e.target.value) || 1
-                )
-              }
+              value={pantryState.numberOfPeople}
+              onChange={(e) => handleInputChange('numberOfPeople', parseInt(e.target.value, 10) || 1)}
             />
             <span>osoba</span>
           </div>
-          <div className="cooking-param">
+
+          <div className="param-group">
             <label htmlFor="prepTime">
-              Vrijeme pripreme: {prepTime} min
+              Vrijeme pripreme: {pantryState.prepTime} min
             </label>
             <input
               id="prepTime"
@@ -450,12 +470,11 @@ export default function PantryPage() {
               min="5"
               max="120"
               step="5"
-              value={prepTime}
-              onChange={e =>
-                setPrepTime(parseInt(e.target.value))
-              }
+              value={pantryState.prepTime}
+              onChange={(e) => handleInputChange('prepTime', parseInt(e.target.value, 10))}
             />
           </div>
+
           <div className="navigation-buttons">
             <button onClick={() => goToStep(2)}>Natrag</button>
             <button onClick={() => goToStep(4)}>Dalje</button>
@@ -463,85 +482,65 @@ export default function PantryPage() {
         </div>
       )}
 
-      {/* STEP 4 */}
-      {currentStep === 4 && (
+      {/* Step 4: Review */}
+      {uiState.currentStep === 4 && (
         <div className="filter-group">
-          <strong>Tvoj pregled prije kuhanja</strong>
-          <ul>
-            <li>
-              <b>Uvijek imam:</b>{' '}
-              {(filterSelections[
-                'Kod kuće uvijek imam'
-              ] || []).join(', ') || 'Ništa odabrano'}
-            </li>
-            <li>
-              <b>Danas imam:</b>{' '}
-              {(filterSelections[
-                'Danas dodatno imam'
-              ] || []).join(', ') || 'Ništa odabrano'}
-            </li>
-            <li>
-              <b>Metode:</b>{' '}
-              {(filterSelections[
-                'Dozvoljen način pripreme'
-              ] || []).join(', ')}
-            </li>
-            <li>
-              <b>Za:</b> {numberOfPeople} osoba,{' '}
-              <b>vrijeme:</b> {prepTime} min
-            </li>
-          </ul>
+          <div className="review-section">
+            <div className="review-item">
+              <strong>Uvijek imam:</strong>
+              <span>{pantryState.alwaysHave.join(', ') || 'Ništa odabrano'}</span>
+            </div>
+            <div className="review-item">
+              <strong>Danas imam:</strong>
+              <span>{pantryState.todayHave.join(', ') || 'Ništa odabrano'}</span>
+            </div>
+            <div className="review-item">
+              <strong>Metode:</strong>
+              <span>{pantryState.preparationMethods.join(', ')}</span>
+            </div>
+            <div className="review-item">
+              <strong>Za:</strong>
+              <span>{pantryState.numberOfPeople} osoba, {pantryState.prepTime} min</span>
+            </div>
+          </div>
+
           <div className="navigation-buttons">
             <button onClick={() => goToStep(3)}>Natrag</button>
             <button
-              onClick={handleRecipeSearch}
-              disabled={loading}
+              onClick={generateRecipe}
+              disabled={uiState.loading}
+              className="primary-btn"
             >
-              {loading ? 'Generiram...' : 'Idemo kuhati!'}
+              {uiState.loading ? 'Generiram...' : 'Idemo kuhati!'}
             </button>
           </div>
         </div>
       )}
 
-      {/* STEP 5 */}
-      {currentStep === 5 && ragRecipe && (
-        <div className="filter-group">
-          <strong>Predloženi recept</strong>
-          {generatedImage && (
+      {/* Step 5: Recipe Result */}
+      {uiState.currentStep === 5 && recipe && (
+        <div className="filter-group recipe-result">
+          {recipe.image_url && (
             <img
-              src={`http://localhost:8000${generatedImage}`}
+              src={`${API_BASE_URL}${recipe.image_url}`}
               alt="Predloženo jelo"
-              style={{
-                width: '100%',
-                margin: '1rem 0',
-                borderRadius: '8px',
-              }}
+              className="recipe-image"
             />
           )}
+
           <div className="recipe-content">
-            <pre
-              style={{
-                whiteSpace: 'pre-wrap',
-                fontSize: '14px',
-                lineHeight: '1.5',
-              }}
-            >
-              {ragRecipe.result}
-            </pre>
+            <pre>{recipe.result}</pre>
           </div>
+
           <div className="navigation-buttons">
-            <button onClick={() => goToStep(4)}>
-              Natrag na pregled
-            </button>
+            <button onClick={() => goToStep(4)}>Natrag na pregled</button>
             <button
-              onClick={handleRecipeSearch}
-              disabled={loading}
+              onClick={generateRecipe}
+              disabled={uiState.loading}
             >
-              {loading
-                ? 'Generiram...'
-                : 'Generiraj novi recept'}
+              {uiState.loading ? 'Generiram...' : 'Generiraj novi recept'}
             </button>
-            <button onClick={startNewSearch}>
+            <button onClick={resetSearch} className="secondary-btn">
               Nova potraga
             </button>
           </div>

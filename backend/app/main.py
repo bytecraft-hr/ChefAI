@@ -60,6 +60,7 @@ os.makedirs("static/images", exist_ok=True)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 # ─────────── Health check ───────────
-@app.get("/ping", tags=["Health"])
-async def ping():
+@app.get("/health", tags=["Health"])
+async def health():
     return {"status": "healthy"}
+

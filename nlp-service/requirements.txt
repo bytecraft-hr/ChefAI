@@ -9,3 +9,5 @@ chromadb==0.4.13
 python-dotenv==1.0.0
 psycopg2-binary==2.9.7
 huggingface-hub
+pydantic
+pydantic-settings
