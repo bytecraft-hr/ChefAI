@@ -14,7 +14,7 @@ router = APIRouter(prefix="/cook", tags=["Cook"])
 logger = logging.getLogger("chef_ai.cook_rag")
 
 # Define the absolute path to match your image downloader
-STATIC_IMAGES_DIR = Path("/home/marko/Desktop/update ChefAI/ChefAI-chat-fix-mobile/backend/app/static/images")
+STATIC_IMAGES_DIR = Path("/home/marko/Desktop/update ChefAI/ChefAI-chat-fix-mobile/static/images")
 
 @router.post("/rag", response_model=CookResponse)
 def cook_with_rag(

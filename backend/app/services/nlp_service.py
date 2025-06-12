@@ -1,4 +1,3 @@
-# /home/marko/IdeaProjects/RAG/langchain-crash-course/chef_ai/backend/app/services/nlp_service.py
 import os
 import uuid
 from datetime import datetime
@@ -40,7 +39,7 @@ def get_recipes_from_db(db: Session) -> List[Dict[str, Any]]:
         .all()
     )
     logger.info(f"get_recipes_from_db returned {len(recipes)} recipes")
-    print("Recipes from DB:", recipes)  # 🔍 Inspect this in logs
+    print("Recipes from DB:", recipes)
 
     out: List[Dict[str, Any]] = []
     for r in recipes:
@@ -57,26 +56,17 @@ def get_recipes_from_db(db: Session) -> List[Dict[str, Any]]:
         })
     return out
 
-
 def get_user_profile_from_db(db: Session, user_id: int) -> Dict[str, Any]:
     user = db.get(User, user_id)
     if not user:
         return {"preferences": {}, "pantry": []}
-<<<<<<< HEAD
 
     prefs_raw = user.settings.preferences if user.settings else {}
-    prefs = prefs_raw if isinstance(prefs_raw, dict) else {}  # ✅ SAFETY CHECK
+    prefs = prefs_raw if isinstance(prefs_raw, dict) else {}
 
     pantry = [item.name for item in user.pantry_items]
     return {"preferences": prefs, "pantry": pantry}
 
-
-=======
-    prefs = user.settings.preferences if user.settings else {}
-    pantry = [item.name for item in user.pantry_items]
-    return {"preferences": prefs, "pantry": pantry}
-
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
 # — Rule-based NLP —
 
 def extract_intent_and_entities(query: str) -> Tuple[str, Dict[str, List[str]]]:
@@ -97,11 +87,7 @@ def filter_recipes(
     prefs: Dict[str, Any]
 ) -> List[Dict[str, Any]]:
     out = []
-<<<<<<< HEAD
     threshold = prefs.get("match_threshold", 0.5)
-=======
-    threshold = 0.5
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
     for r in recipes:
         ingr = set(r["ingredients"])
         if len(ingr & set(pantry)) / max(len(ingr), 1) < threshold:
@@ -156,17 +142,18 @@ def build_vector_store(recipes: List[Dict[str, Any]]):
         else:
             logger.info("Chroma directory does not exist, creating a new one.")
             logger.info(f"Number of recipes fetched from DB: {len(recipes)}")
-            print("Recipes received by build_vector_store:", recipes)  # Debugging
+            print("Recipes received by build_vector_store:", recipes)
+
             docs = [
-    Document(
-        page_content=f"{r['title']}. {r['instructions']}",
-        metadata={"id": r['id'], "diet": r.get('diet', 'any')}
-    )
-    for r in recipes
-]
+                Document(
+                    page_content=f"{r['title']}. {r['instructions']}",
+                    metadata={"id": r['id'], "diet": r.get('diet', 'any')}
+                )
+                for r in recipes
+            ]
 
             logger.info(f"Number of LangChain documents created: {len(docs)}")
-            print("LangChain Documents:", docs)  # Debugging
+            print("LangChain Documents:", docs)
             splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
             chunks = splitter.split_documents(docs)
             logger.info(f"Number of document chunks created: {len(chunks)}")
@@ -196,8 +183,4 @@ def create_rag_chain(llm, store, k: int = 4):
         ("human", "{input}")
     ])
     stuff = create_stuff_documents_chain(llm, qa_prompt)
-<<<<<<< HEAD
     return create_retrieval_chain(har, stuff)
-=======
-    return create_retrieval_chain(har, stuff)
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

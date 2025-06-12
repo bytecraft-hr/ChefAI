@@ -1,12 +1,14 @@
+/* PantryPage.css - cleaned conflict-free */
+
 .pantry-grid {
   background-color: #fffdf7;
   border: 1px solid #e8dfd4;
   border-radius: 12px;
-  min-height: calc(100vh - 40px); 
+  min-height: calc(100vh - 40px);
   display: flex;
   flex-direction: column;
-  justify-content: center; 
-  align-items: center;     
+  justify-content: center;
+  align-items: center;
   box-sizing: border-box;
   padding: 20px;
   width: 100%;
@@ -14,12 +16,9 @@
 
 @media (max-width: 900px) {
   .pantry-grid {
-   
-    min-height: calc(100vh - 100px); 
-
+    min-height: calc(100vh - 100px);
   }
 }
-
 
 /* Sekcija */
 .pantry-section {
@@ -43,7 +42,7 @@
 }
 
 /* Naslov grupe */
-.filter-group > strong {
+.filter-group>strong {
   font-size: 1.2rem;
   color: #c66900;
   margin-bottom: 1rem;
@@ -71,8 +70,6 @@
   transition: color 0.2s ease;
 }
 
-
-
 .add-custom-filter {
   display: flex;
   gap: 0.5rem;
@@ -80,19 +77,14 @@
   align-items: stretch;
 }
 
-
-
-
-
-
 /* Gumbi */
 .add-custom-filter button,
 .navigation-buttons button,
-.filter-group > button {
+.filter-group>button {
   background: #ffa940;
   border: none;
   padding: 0.5rem 1.2rem;
-  margin-top:10px;
+  margin-top: 10px;
   border-radius: 6px;
   color: white;
   font-weight: 600;
@@ -102,11 +94,11 @@
 
 .add-custom-filter button:hover,
 .navigation-buttons button:hover,
-.filter-group > button:hover {
+.filter-group>button:hover {
   background: #e6952f;
 }
 
-/* Navigacijski gumbi*/
+/* Navigacijski gumbi */
 .navigation-buttons {
   display: flex;
   justify-content: space-between;
@@ -114,7 +106,6 @@
   gap: 0.5rem;
   flex-wrap: wrap;
 }
-
 
 /* Progress bar */
 .progress-container {
@@ -131,8 +122,6 @@
   width: 0%;
   transition: width 0.3s ease-in-out;
 }
-
-
 
 .icon-button {
   background: none;
@@ -172,26 +161,11 @@
   background-color: white;
   display: inline-block;
   position: relative;
-  vertical-align: middle;
   cursor: pointer;
   transition: all 0.2s ease;
   flex-shrink: 0;
 }
 
-/* Hover efekt */
-.option input[type="checkbox"]:hover,
-.option-with-remove input[type="checkbox"]:hover {
-  box-shadow: 0 0 0 3px rgba(198, 105, 0, 0.15);
-}
-
-/* Kad je označeno */
-.option input[type="checkbox"]:checked,
-.option-with-remove input[type="checkbox"]:checked {
-  background-color: #e0f7e9;
-  border-color: #4caf50;
-}
-
-/* Kvačica */
 .option input[type="checkbox"]::after,
 .option-with-remove input[type="checkbox"]::after {
   content: '';
@@ -211,6 +185,8 @@
 .option-with-remove input[type="checkbox"]:checked::after {
   opacity: 1;
 }
+
+/* Cooking parameters */
 .cooking-params {
   background: #fff4d9;
   border: 1px solid #ffe0b2;
@@ -224,14 +200,12 @@
   box-sizing: border-box;
 }
 
-/* Naslov */
 .cooking-params h3 {
   font-size: 1.4rem;
   color: #c66900;
   margin-bottom: 1.5rem;
 }
 
-/* Pojedinačni parametri */
 .cooking-param {
   display: flex;
   align-items: center;
@@ -240,22 +214,19 @@
   font-size: 1rem;
 }
 
-/* Labela */
 .cooking-param label {
   font-weight: 500;
   color: #444;
 }
 
-/* Broj osoba */
 .cooking-param input[type="number"] {
-  width:80px;
+  width: 80px;
   padding: 0.4rem 0.6rem;
   border: 1px solid #ccc;
   border-radius: 6px;
   font-size: 1rem;
 }
 
-/* Range slider */
 .cooking-param input[type="range"] {
   flex: 1;
   accent-color: #ffa940;
@@ -263,72 +234,46 @@
   cursor: pointer;
 }
 
+@media (max-width: 600px) {
+  .filter-actions {
+    flex-direction: column;
+    align-items: stretch;
+    margin-top: 1.5rem;
+  }
 
+  .filter-actions .add-custom-filter {
+    display: flex;
+    width: 100%;
+    gap: 0.5rem;
+  }
 
+  .filter-actions .add-custom-filter input {
+    flex: 1;
+  }
 
+  .filter-actions .button-add-circle {
+    flex-shrink: 0;
+    width: 50px;
+  }
 
-/* STEP 4: Sažetak pred kuhanje */
-.summary-step {
-  background-color: #fffaf0;
-  border: 1px solid #ffdba7;
-  border-radius: 12px;
-  padding: 2rem 2.5rem;
-  box-shadow: 0 2px 6px rgba(255, 193, 102, 0.25);
-  margin-top: 1.5rem;
-  color: #333;
-  animation: fadeIn 0.5s ease-in-out;
+  .filter-actions .button-orange {
+    margin-top: 0.7rem;
+    width: 100%;
+  }
 }
-
-.summary-step h3 {
-  font-size: 1.6rem;
-  margin-bottom: 1.2rem;
-  color: #cc6600;
-}
-
-.summary-section {
-  margin-bottom: 1.5rem;
-}
-
-.summary-section h4 {
-  margin: 0.5rem 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #b35400;
-  border-bottom: 1px solid #ffd9a0;
-  padding-bottom: 0.3rem;
-}
-
-.summary-section ul {
-  margin: 0.4rem 0 0 1rem;
-  padding: 0;
-  list-style-type: none;
-}
-
-
-
-.summary-section ul li {
-  font-size: 1rem;
-  margin-bottom: 0.3rem;
-}
-
-.summary-final {
-  font-weight: 500;
-  color: #444;
-  font-size: 1rem;
-}
-
-.summary-highlight {
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #e65100;
-}
-
-
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
+
 .button-orange {
   background-color: #ffa63d;
   color: white;
@@ -358,6 +303,7 @@
   font-weight: 500;
   margin-top: 1rem;
 }
+
 .option-with-remove {
   display: flex;
   justify-content: space-between;
@@ -369,230 +315,7 @@
   border: 1px solid #f5d5a1;
 }
 
-
 .button-add-circle:hover {
   background-color: #ff931a;
   transform: scale(1.1);
 }
-
-.daily-tip {
-  font-style: italic;
-  background-color: #fff8e4;
-  border-left: 4px solid #ffc107;
-  padding: 0.8rem 1.2rem;
-  border-radius: 6px;
-  margin-bottom: 1.2rem;
-  color: #8a5c00;
-  font-size: 0.95rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.03);
-}
-
-.empty-hint {
-  text-align: center;
-  font-size: 1.5rem;
-  color: #a66400;
-  background-color: #fff7e6;
-  border: 2px solid #ffc266; 
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  animation: fadeIn 0.4s ease-in-out;
-  box-shadow: 0 0 0 3px #fffdf7; 
-}
-
-.empty-hint p {
-  font-size: 25px;
-}
-.filter-actions {
-  display: flex;
-  flex-wrap: wrap;
-  margin-top: 1.2rem;
-  justify-content: flex-start;
-  align-items: center;
-}
-
-.filter-actions .add-custom-filter {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  flex: 1 1 auto;
-  min-width: 200px;
-}
-
-
-
-.add-custom-filter input {
-  flex: 1;
-  min-width: 140px;
-  max-width: 180px;
-  padding: 0.5rem;
-  border-radius: 9px;
-  margin-top:10px;
-  border: 2px solid #ccc;
-  font-size: 1rem;
-  box-sizing: border-box;
-}
-
-
-
-
-
-.filter-actions .button-add-circle {
-  width: 40px;
-  height: 40px;
-  font-size: 1.5rem;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.filter-actions .button-orange {
-  height: 40px;
-  white-space: nowrap;
-  font-size: 1rem;
-  padding: 0.5rem 1.2rem;
-}
-
-
-/* Mobilna responzivnost */
-@media (max-width: 600px) {
-  .filter-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .filter-actions .add-custom-filter {
-    display: flex;
-    width: 100%;
-    gap: 0.5rem;
-  }
-
-  .filter-actions .add-custom-filter input {
-    flex: 1;
-  }
-
-  .filter-actions .button-add-circle {
-    flex-shrink: 0;
-    width: 50px;
-  }
-
-  .filter-actions .button-orange {
-    margin-top: 0.7rem;
-    width: 100%;
-  }
-
-  .add-custom-filter input {
-    max-width: 100%;
-
-  }
-
-}
-
-
-/* step 1 - dozvoljen nacin pripreme */
-.preparation-options {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-@media (max-width: 600px) {
-  .preparation-options {
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .preparation-options .option label {
-    font-size: 1rem;
-  }
-}
-
-
-
-@media (max-width: 600px) {
-  .cooking-param {
-    flex-direction: row;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .cooking-param label {
-    min-width: auto;
-  }
-
-  .cooking-param input[type="number"] {
-    width: 30%;
-    flex-shrink: 0;
-  }
-
-  .cooking-param span {
-    flex-shrink: 0;
-  }
-}
-
-
-/* Mobilna prilagodba */
-@media (max-width: 600px) {
-  .navigation-buttons {
-    flex-direction: column;
-    align-items: stretch;
-    margin-top: 1.5rem;
-  }
-
-  .navigation-buttons button {
-    width: 100%;
-  }
-  
-<<<<<<< HEAD
-}
-
-/* Loading overlay when recipe+image are being generated */
-.loading-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255,255,255,0.85);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.4rem;
-  color: #c66900;
-  z-index: 1000;
-}
-
-/* Card for each returned recipe */
-.recipe-card {
-  background: #fffaf0;
-  border: 1px solid #ffdba7;
-  border-radius: 8px;
-  padding: 1rem 1.2rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* Container for the generated image */
-.recipe-card img,
-.recipe-image-container img {
-  width: 100%;
-  max-width: 400px;
-  border-radius: 6px;
-  margin-bottom: 1rem;
-}
-
-/* Center any img inside .filter-group */
-.filter-group img {
-  display: block;
-  margin: 0 auto;
-}
-
-/* Ensure <pre> wraps properly */
-.recipe-card pre {
-  white-space: pre-wrap;
-  font-family: inherit;
-  margin: 0;
-}
-=======
-}
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

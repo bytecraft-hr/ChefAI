@@ -70,8 +70,4 @@ async def chat_rule(
             {"role": "user", "content": req.query},
             {"role": "bot", "content": msg}
         ]
-<<<<<<< HEAD
     )
-=======
-    )
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

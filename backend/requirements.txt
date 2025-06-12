@@ -20,16 +20,9 @@ huggingface_hub
 mistralai
 langchain-mistralai
 langchain-community
-<<<<<<< HEAD
-langchain-chroma
+langchain-chroma>=0.1.2
 chromadb
 pandas
 python-slugify
 Pillow
 beautifulsoup4
-
-=======
-chromadb
-langchain-chroma>=0.1.2
-pandas
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa

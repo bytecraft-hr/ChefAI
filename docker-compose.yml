@@ -1,5 +1,4 @@
 services:
-
   postgres:
     image: postgres:14
     restart: always
@@ -22,55 +21,73 @@ services:
     build:
       context: ./nlp-service
       dockerfile: Dockerfile
+      args:
+        # Pass build args for network configuration if needed
+        - PIP_TIMEOUT=300
+        - PIP_RETRIES=5
     restart: always
     env_file:
       - ./.env
     ports:
       - "8001:8001"
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
+    # Add healthcheck for nlp-service
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8001/health', timeout=10)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   backend:
     build:
       context: ./backend
       dockerfile: Dockerfile
+      args:
+        - PIP_TIMEOUT=300
+        - PIP_RETRIES=5
     restart: always
     env_file:
       - ./.env
     ports:
       - "8000:8000"
     depends_on:
-      - postgres
-      - nlp-service
+      postgres:
+        condition: service_healthy
+      nlp-service:
+        condition: service_healthy
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./langchain-f849f-firebase-adminsdk-fbsvc-d0950e3194.json:/app/firebase-credentials.json:ro
-<<<<<<< HEAD
       - ./static:/app/static
-    # ADDED SECTION:
     environment:
       - PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION=python
-=======
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
-
+    # Add healthcheck for backend
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health', timeout=10)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
 
   frontend:
     build:
-<<<<<<< HEAD
       context: ./frontend-cookbook-ai
-=======
-      context: ./frontend-cookbook-ai          # ← relative to this yaml
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
       dockerfile: Dockerfile
     ports:
       - "3000:80"
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
+    # Add healthcheck for frontend
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:80/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-<<<<<<< HEAD
   postgres_data:
-=======
-  postgres_data:
->>>>>>> ca23dc08af9d27adb02a102d31479653c8b874fa
